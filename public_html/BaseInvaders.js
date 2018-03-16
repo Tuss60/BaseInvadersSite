@@ -92,6 +92,14 @@ function repaint(init) {
 
     g2x.strokeStyle = "#FFFFFF";
     g2x.lineWidth = 1;
+
+    state.wormholes.forEach(function (wormhole) {
+        g2x.fillStyle = "#660066";
+        g2x.beginPath();
+        g2x.arc(wormhole.px * widthRatio, wormhole.py * heightRatio, wormhole.radius * (widthRatio + heightRatio) / 2, 0, Math.PI * 2);
+        g2x.fill();
+    });
+
     state.mines.forEach(function (mine) {
         if (pmap[mine.owner]) {
             g2x.drawImage(shipImages[pmap[mine.owner].id % 60], mine.px * widthRatio - stroke * 1, mine.py * heightRatio - stroke * 1, stroke * 2, stroke * 2);
