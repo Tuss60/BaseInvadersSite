@@ -26,13 +26,20 @@ function repaint(init) {
 
     g2x.clearRect(0, 0, state.width, state.height);
 
-
+    var pmines = {};
+    state.mines.forEach(function(mine) {
+        if (pmines[mine.owner]) {
+            pmines[mine.owner]++;
+        } else {
+            pmines[mine.owner]=1;
+        }
+    });
 
     var pmap = {};
     if (tableWidgets.length !== state.players.length) {
 
         leaderboard$.empty();
-        var table = $("<table style='width: 100%' ><th colspan='2' style='color: white; text-align: left'>Player</th><th style='color: white; text-align: right'>Score</th></table>");
+        var table = $("<table style='width: 100%' ><th colspan='3' style='color: white; text-align: left'>Player</th><th style='color: white; text-align: right'>Score</th></table>");
         leaderboard$.append(table);
 
         tableWidgets = [];
@@ -55,6 +62,14 @@ function repaint(init) {
             var img = $("<img src='ship" + (player.id % 60) + ".png' style='width: 12px; height: 12px' />");
             td.append(img);
             rowWidgets.push(img);
+
+            table.append(tr);
+            td = $("<td style='text-align: center'; width: 14px />");
+            tr.append(td);
+            var label = $("<label style='color:orange; font: monospace'/>");
+            td.append(label);
+            label.text(pmines[player.name] ? fill(pmines[player.name],2,'0') : "00");
+            rowWidgets.push(label);
 
             table.append(tr);
             td = $("<td style='text-align: left' />");
@@ -80,13 +95,12 @@ function repaint(init) {
         });
         for (var i = 0; i < tempPlayers.length; i++) {
             tableWidgets[i][0].attr("src", 'ship' + (tempPlayers[i].id % 60) + '.png');
-            tableWidgets[i][1].text(tempPlayers[i].name);
-            tableWidgets[i][2].text(tempPlayers[i].score);
+            tableWidgets[i][1].text(pmines[state.players[i].name] ? fill(pmines[state.players[i].name],2,'0') : "00");
+            tableWidgets[i][2].text(tempPlayers[i].name);
+            tableWidgets[i][3].text(tempPlayers[i].score);
             pmap[state.players[i].name] = tempPlayers[i];
         }
     }
-
-
 
     var stroke = Math.min(state.width, state.height) / 1024;
 
@@ -107,7 +121,7 @@ function repaint(init) {
             console.log("pbig");
             g2x.fillStyle = "#FF0000";
             g2x.beginPath();
-            g2x.arc(bomb.px * widthRatio, bomb.py * heightRatio, stroke * state.bombRadius * Math.max(widthRatio, heightRatio), 0, Math.PI * 2);
+            g2x.arc(bomb.px * widthRatio, bomb.py * heightRatio, state.bombRadius * Math.max(widthRatio, heightRatio), 0, Math.PI * 2);
             g2x.fill();
         } else {
             console.log("psmall", bomb.delay, bomb.life);
@@ -116,7 +130,7 @@ function repaint(init) {
             g2x.arc(bomb.px * widthRatio, bomb.py * heightRatio, stroke * .6, 0, Math.PI * 2);
             g2x.fill();
         }
-
+        
     });
 
 
